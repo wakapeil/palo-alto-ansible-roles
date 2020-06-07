@@ -20,11 +20,11 @@ ansible-galaxy collection install paloaltonetworks.panos
 ```
 
 # Notes
- This role is meant to be used with other tasks/roles. It shouldn't be too difficult to integrate it into workflows (for example, creating address objects or security policies for VPN subnets). 
+ This role is meant to be used with other tasks/roles. It shouldn't be too difficult to integrate it into workflows that also create address objects and security policies for the VPN. 
 
  Tested on PanOS 8.1, 9.0, and 9.1
 
- Using the `--check` flag will fail when creating proxy-IDs if the VPN tunnel does not exist. It's still pretty safe to run the playbook as long as the `vpn_commit_config` flag is set to 'false'. Firewall changes only take place after they've been commited 
+Using the `--check` flag will fail when creating proxy-IDs if the VPN tunnel does not exist. It's still pretty safe to run the playbook as long as the `vpn_commit_config` flag is set to 'false'. 
  
 # List of Configurable Variables
 Below is a list of configurable variables, along with some examples of the values they accept. 
