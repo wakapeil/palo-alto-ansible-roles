@@ -85,7 +85,7 @@
     - '{{ vpn_remote_subnet }}'
   loop_control:
     index_var: index
-
+    label: 'name:{{ vpn_proxy_id_name }}-{{ index | int + 1}} local:{{ item.0 }} remote:{{ item.1 }}'
 # Create Static routes. Route names will be in the format "vpn_name-x", with x incrementing by 1 for every iteration of the loop
 - name: Create Static route
   panos_static_route:
@@ -100,6 +100,7 @@
     - '{{ vpn_remote_subnet }}'
   loop_control:
     index_var: index
+    label: 'name:{{ vpn_name }}-{{ index | int + 1 }} destination:{{ item }}'
 
 # Commit configuration
 - name: commit candidate config on firewall
