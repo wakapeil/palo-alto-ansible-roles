@@ -4,7 +4,7 @@ This role will automate creating VPN tunnels for Palo Alto firewalls. Specifical
 - IPSec crypto profiles
 - IKE gateways
 - Tunnel interfaces
-- IPSec tunnels, and optionally Proxy-IDs
+- IPSec tunnels, and optionally proxy-IDs
 - Static routes
 
 This role is not intended to be a "one size fits all" solution; it's a baseline that can (and should) be customized to meet your specific needs. Refer to the `examples` folder to understand how it can be used, and feel free to make any modifications you want. 
