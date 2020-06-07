@@ -1,5 +1,5 @@
 # What this is for
-This role will automate creating VPN tunnels for Palo Alto firewalls. Specifically, it configures the following items:
+This role will automate creating VPN tunnels for Palo Alto firewalls. Specifically, it will configure the following items:
 - IKE crypto profiles
 - IPSec crypto profiles
 - IKE gateways
