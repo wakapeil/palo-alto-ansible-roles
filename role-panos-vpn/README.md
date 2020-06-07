@@ -7,7 +7,7 @@ This role will automate creating VPN tunnels for Palo Alto firewalls. Specifical
 - IPSec tunnels, and optionally proxy-IDs
 - Static routes
 
-This role is not intended to be a "one size fits all" solution; it's a baseline that can (and should) be customized to meet your specific needs. Refer to the `examples` folder to understand how it can be used, and feel free to make any modifications you want. 
+This role is not intended to be a "one size fits all" solution; it's a foundation that can (and should) be customized to meet your specific needs. Refer to the `examples` folder to understand how it can be used, and feel free to make any modifications you want. 
 
 
 # Usage Instructions
@@ -28,10 +28,10 @@ Using the `--check` flag will fail when creating proxy-IDs if the VPN tunnel doe
  
 # List of Configurable Variables
 Below is a list of configurable variables, along with some examples of the values they accept. 
-You can find additional module-specific details [here](https://ansible-pan.readthedocs.io/en/latest/modules/index.html)
+You can find additional module-specific details [here](https://ansible-pan.readthedocs.io/en/latest/modules/index.html).
 
 
-Some default values have already been set in `/defaults/main.yml`, but those can be changes at any time.
+Some default values have already been set in `/defaults/main.yml`, but those can be changed at any time.
 
 ## Required Settings  
 vpn_panos_provider:
