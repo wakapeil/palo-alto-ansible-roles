@@ -1,0 +1,43 @@
+---
+# This playbook uses all default values and uses the minimum config required to get a tunnel working
+
+
+- hosts: # Enter your host here
+  connection: local
+
+  vars: 
+# Required Settings
+    vpn_name: 'test-vpn'
+    vpn_local_peer_ip: '1.1.1.1' 
+    vpn_remote_peer_ip: '9.9.9.9'
+    vpn_preshared_key: 'secret' 
+
+# Manually define local and remote subnets    
+    vpn_local_subnet: 
+        - 172.16.10.0/24 # All subnet values must be in CIDR notation
+        - 172.16.20.0/24
+
+    vpn_remote_subnet: 
+        - 10.200.10.0/24
+        - 10.200.20.0/24
+        - 10.200.30.0/24
+
+# IKE Crypto Profile Settings
+    vpn_ike_version: 'ikev2'
+    vpn_phase1_authentication: 'sha256'
+    vpn_phase1_encryption: 'aes-256-cbc'
+    vpn_phase1_dhgroup: 'group20'
+    vpn_phase1_lifetime_hours: '8'
+
+# IPSec Crypto Profile Settings
+    vpn_phase2_authentication: 'sha256'
+    vpn_phase2_encryption: 'aes-256-cbc'
+    vpn_phase2_dhgroup: 'group14'
+    vpn_phase2_lifetime_hours: '1'
+
+# Tunnel Interface settings:
+    vpn_tunnel_zone: 'testzone'
+    vpn_tunnel_interface_number: '210'
+
+  roles:
+    - role-panos-vpn

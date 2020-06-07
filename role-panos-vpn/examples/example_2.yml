@@ -1,0 +1,50 @@
+---
+# This playbook uses a lot of non-default values, and also pulls IPs from txt files with line-separated values
+
+- hosts: # Enter your host here
+  connection: local
+
+  vars:
+# General Settings
+    vpn_panos_provider: '{{ NON-DEFAULT-PROVIDER }}' 
+    vpn_state: 'present'
+    vpn_configure_proxy_id: 'true'
+    vpn_enable_nat_traversal: 'true'
+    vpn_enable_passive_mode: 'true'
+
+    vpn_commit_config: 'true' # This will commit the change. USE WITH CAUTION
+  
+# Required Settings
+    vpn_name: 'test-vpn'
+    vpn_local_peer_ip: '1.1.1.1'
+    vpn_remote_peer_ip: '9.9.9.9'
+    vpn_preshared_key: 'secret' 
+    
+# Load local and remote subnets from a file
+    vpn_local_subnet: "{{ lookup('file', 'local_addresses.txt').splitlines() }}" # All subnet values must be in CIDR notation
+    vpn_remote_subnet: "{{ lookup('file', 'remote_addresses.txt').splitlines() }}"
+
+# IKE Crypto Profile Settings
+    vpn_ike_version: 'ikev1'
+    vpn_phase1_authentication: 'sha256'
+    vpn_phase1_encryption: 'aes-256-cbc'
+    vpn_phase1_dhgroup: 'group20'
+    vpn_phase1_lifetime_hours: '8'
+
+    vpn_local_id_type: 'ipaddr'  
+    vpn_local_id_value: '{{ vpn_local_peer_ip }}'
+    vpn_peer_id_type: 'ipaddr'  
+    vpn_peer_id_value: '{{ vpn_remote_peer_ip }}'
+
+# IPSec Crypto Profile Settings
+    vpn_phase2_authentication: 'sha256'
+    vpn_phase2_encryption: 'aes-256-cbc'
+    vpn_phase2_dhgroup: 'no-pfs'
+    vpn_phase2_lifetime_hours: '1'
+
+# Tunnel Interface settings:
+    vpn_tunnel_zone: 'testzone'
+    vpn_tunnel_interface_number: '210'
+
+  roles:
+    - role-panos-vpn

@@ -1,0 +1,22 @@
+---
+# defaults file for role-panos-vpn
+
+# Values that aren't like to change often. Adjust to match your needs
+vpn_panos_provider: '{{ YOUR_PROVIDER_GOES_HERE }}'
+vpn_virtual_router: 'default'
+vpn_state: 'present'
+vpn_ike_gateway_interface: 'ethernet1/1'
+
+# Default object names
+vpn_phase1_profile_name: '{{ vpn_name }}-ike-profile'
+vpn_phase2_profile_name: '{{ vpn_name }}-ipsec-profile'
+vpn_ike_gateway_name: '{{ vpn_name }}-ike-gateway'
+vpn_ipsec_tunnel_name: '{{ vpn_name }}'
+vpn_proxy_id_name: '{{ vpn_name }}-Proxy-ID'
+vpn_static_route_name: '{{ vpn_name }}'
+
+# Default Flags
+vpn_commit_config: 'false'
+vpn_configure_proxy_id: 'false'
+vpn_enable_nat_traversal: 'false'
+vpn_enable_passive_mode: 'false'

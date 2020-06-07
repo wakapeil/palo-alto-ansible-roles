@@ -1,0 +1,108 @@
+---
+# tasks file for role-panos-vpn
+
+# IKE Crypto Profile
+- name: Create IKE Crypto Profile
+  panos_ike_crypto_profile:
+    name: '{{ vpn_phase1_profile_name }}'
+    authentication: '{{ vpn_phase1_authentication}}'
+    encryption: '{{ vpn_phase1_encryption}}'
+    lifetime_hours: '{{ vpn_phase1_lifetime_hours}}'
+    dh_group: '{{ vpn_phase1_dhgroup}}'
+    provider: '{{ vpn_panos_provider }}'
+    state: '{{ vpn_state }}'
+    commit: 'false'
+
+# IPSec Crypto Profile
+- name: Create IPSec Crypto Profile
+  panos_ipsec_profile:
+    name: '{{ vpn_phase2_profile_name }}'
+    esp_authentication: '{{ vpn_phase2_authentication}}'
+    esp_encryption: '{{ vpn_phase2_encryption}}'
+    lifetime_hours: '{{ vpn_phase2_lifetime_hours}}'
+    dh_group: '{{ vpn_phase2_dhgroup }}'
+    provider: '{{ vpn_panos_provider }}'
+    state: '{{ vpn_state  }}'
+    commit: 'false'
+
+# IKE Gateway
+- name: Create the IKE Gateway
+  panos_ike_gateway:
+    name: '{{ vpn_ike_gateway_name }}'
+    version: '{{ vpn_ike_version }}'
+    interface: '{{ vpn_ike_gateway_interface }}'
+    peer_ip_value: '{{ vpn_remote_peer_ip }}'
+    local_id_type: '{{ vpn_local_id_type | default(omit) }}'
+    local_id_value: '{{ vpn_local_id_value | default(omit)  }}'
+    peer_id_type: '{{ vpn_peer_id_type | default(omit) }}'
+    peer_id_value: '{{ vpn_peer_id_value | default(omit) }}'
+    pre_shared_key: '{{ vpn_preshared_key }}'
+    enable_nat_traversal: '{{ vpn_enable_nat_traversal }}'
+    ikev1_crypto_profile: '{{ vpn_phase1_profile_name }}'
+    ikev2_crypto_profile: '{{ vpn_phase1_profile_name }}'
+    enable_dead_peer_detection: '{{ vpn_enable_dpd | default(omit) }}'  
+    passive_mode: '{{ vpn_enable_passive_mode }}'
+    provider: '{{ vpn_panos_provider }}'
+    state: '{{ vpn_state  }}'
+    commit: 'false'
+
+# Create tunnel interface. Zone will be created automatically if it doesn't exist
+- name: Create VPN Tunnel Interface
+  panos_tunnel:
+    zone_name: '{{ vpn_tunnel_zone }}'
+    if_name: 'tunnel.{{ vpn_tunnel_interface_number }}'
+    vr_name: '{{ vpn_virtual_router }}'
+    ip: '{{ vpn_tunnel_interface_ip | default(omit) }}'
+    provider: '{{ vpn_panos_provider }}'
+    state: '{{ vpn_state  }}'
+    commit: 'false'
+
+# Create VPN Tunnel
+- name: Create VPN Tunnel
+  panos_ipsec_tunnel:
+    name: '{{ vpn_ipsec_tunnel_name }}'
+    tunnel_interface: 'tunnel.{{ vpn_tunnel_interface_number }}'
+    ak_ike_gateway: '{{ vpn_ike_gateway_name }}'
+    ak_ipsec_crypto_profile: '{{ vpn_phase2_profile_name }}'
+    provider: '{{ vpn_panos_provider }}'
+    disabled: '{{ vpn_is_disabled }}'
+    state: '{{ vpn_state  }}'
+    commit: 'false'
+
+# Create Proxy IDs if needed. Proxy-ID names will be in the format "Proxy-ID-x", with x incrementing by 1 for every iteration of the loop
+- name: Create Proxy IDs if needed
+  panos_ipsec_ipv4_proxyid:
+    provider: '{{ vpn_panos_provider }}'
+    name: '{{ vpn_proxy_id_name }}-{{ index | int + 1}}'
+    tunnel_name: '{{ vpn_ipsec_tunnel_name }}'
+    local: '{{ item.0 }}'
+    remote: '{{ item.1 }}'
+    state: '{{ vpn_state  }}'
+    commit: 'false'
+  when: vpn_configure_proxy_id == 'true'
+  with_nested:
+    - '{{ vpn_local_subnet }}'
+    - '{{ vpn_remote_subnet }}'
+  loop_control:
+    index_var: index
+
+# Create Static routes. Route names will be in the format "vpn_name-x", with x incrementing by 1 for every iteration of the loop
+- name: Create Static route
+  panos_static_route:
+    provider: '{{ vpn_panos_provider }}'
+    name: '{{ vpn_name }}-{{ index | int + 1 }}'
+    virtual_router: '{{ vpn_virtual_router }}'
+    destination: '{{ item }}'
+    interface: 'tunnel.{{ vpn_tunnel_interface_number }}'
+    nexthop_type: 'none'
+    state: '{{ vpn_state }}'
+  with_items:
+    - '{{ vpn_remote_subnet }}'
+  loop_control:
+    index_var: index
+
+# Commit configuration
+- name: commit candidate config on firewall
+  panos_commit:
+    provider: '{{ provider }}'
+  when: vpn_commit_config == 'true'
